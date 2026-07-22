@@ -49,6 +49,7 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             position: relative;
+            z-index: 10;
         }
 
         .header {
@@ -94,7 +95,6 @@
 
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* About Us Section Styling */
         .about-us-box {
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid rgba(245, 158, 11, 0.2);
@@ -121,7 +121,6 @@
             color: #cbd5e1;
         }
 
-        /* Slideshow Gallery Styling */
         .slideshow-container {
             position: relative;
             max-width: 100%;
@@ -152,7 +151,6 @@
             opacity: 0.9;
         }
 
-        /* Prev & next buttons */
         .prev-slide, .next-slide {
             cursor: pointer;
             position: absolute;
@@ -183,11 +181,11 @@
             border-color: #f59e0b;
         }
 
-        /* FIXED & UPDATED: Professional Image Lightbox Modal */
+        /* FIXED: Professional Image Lightbox Modal Stack Order Priority Boosted */
         .image-modal {
             display: none;
             position: fixed;
-            z-index: 2000;
+            z-index: 99999; /* Moved way ahead to bypass overlapping elements */
             top: 0;
             left: 0;
             width: 100vw;
@@ -220,8 +218,8 @@
             justify-content: center;
             transform: scale(0.9);
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            overflow: hidden; /* Contains the image when zooming */
-            touch-action: none; /* Disables browser-default zoom/pan adjustments */
+            overflow: hidden;
+            touch-action: none;
             border-radius: 16px;
         }
 
@@ -239,10 +237,9 @@
             border: 1px solid rgba(255, 255, 255, 0.15);
             display: block;
             transform-origin: center center;
-            transition: transform 0.05s ease-out; /* Keeps updates looking real-time and snappy */
+            transition: transform 0.05s ease-out;
         }
 
-        /* Repositioned floating UI layout structure to prevent asset clipping */
         .modal-close {
             position: fixed;
             top: 20px;
@@ -259,7 +256,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 2010;
+            z-index: 100000; /* Stays above the main image lightbox background container layer */
         }
 
         .modal-close:hover {
@@ -267,11 +264,10 @@
             border-color: #f59e0b;
         }
 
-        /* Order Review Modal Layout Styles */
         .order-review-modal {
             display: none;
             position: fixed;
-            z-index: 3000;
+            z-index: 90000;
             top: 0;
             left: 0;
             width: 100%;
@@ -473,7 +469,6 @@
             background-color: rgba(15, 23, 42, 0.9);
         }
 
-        /* Menu Item Styling */
         .menu-item {
             background: rgba(15, 23, 42, 0.45);
             padding: 20px;
@@ -506,7 +501,6 @@
             line-height: 1.5;
         }
 
-        /* Mobile Quantity Stepper */
         .stepper-container {
             display: flex;
             align-items: center;
@@ -657,7 +651,6 @@
         <i class="fas fa-sun ph-sun"></i>
     </div>
 
-    <!-- ABOUT US SECTION -->
     <div class="about-us-box">
         <h2>Taste the Taste of Home 🇵🇭</h2>
         <p>Welcome to Lumpia Kwin NZ! We bring the vibrant, rich, and comforting flavors of traditional Filipino kitchens straight to Auckland. From our ultra-crispy, hand-rolled golden lumpia to our classic savory platters and sweet native delicacies, every single dish is prepared with passion using timeless family recipes.</p>
@@ -665,67 +658,23 @@
 
     <!-- SLIDESHOW GALLERY -->
     <div class="slideshow-container">
-        <!-- Slide 1 -->
-        <div class="mySlides">
-            <img src="image1.jpg" alt="Signature Crispy Golden Lumpia" onclick="openModal(this)">
-        </div>
+        <div class="mySlides"><img src="image1.jpg" alt="Signature Crispy Golden Lumpia" onclick="openModal(this)"></div>
+        <div class="mySlides"><img src="image2.jpg" alt="Authentic Crispy Ilocos Empanada" onclick="openModal(this)"></div>
+        <div class="mySlides"><img src="image3.jpg" alt="Savory Pinoy Mixed Platters" onclick="openModal(this)"></div>
+        <div class="mySlides"><img src="image4.jpg" alt="Traditional Sweet Native Desserts" onclick="openModal(this)"></div>
+        <div class="mySlides"><img src="image5.jpg" alt="Lumpia Kwin Specialty Dish" onclick="openModal(this)"></div>
+        <div class="mySlides"><img src="image6.jpg" alt="Lumpia Kwin Catering Tray" onclick="openModal(this)"></div>
+        <div class="mySlides"><img src="image7.jpg" alt="Authentic Pinoy Cooking" onclick="openModal(this)"></div>
+        <div class="mySlides"><img src="image8.jpg" alt="Homemade Filipino Goodness" onclick="openModal(this)"></div>
+        <div class="mySlides"><img src="image9.jpg" alt="Auckland Favorite Filipino Food" onclick="openModal(this)"></div>
+        <div class="mySlides"><img src="image10.jpg" alt="Lumpia Kwin Dessert" onclick="openModal(this)"></div>
+        <div class="mySlides"><img src="image11.jpg" alt="Filipino Sauce and Vinegar Blend" onclick="openModal(this)"></div>
 
-        <!-- Slide 2 -->
-        <div class="mySlides">
-            <img src="image2.jpg" alt="Authentic Crispy Ilocos Empanada" onclick="openModal(this)">
-        </div>
-
-        <!-- Slide 3 -->
-        <div class="mySlides">
-            <img src="image3.jpg" alt="Savory Pinoy Mixed Platters" onclick="openModal(this)">
-        </div>
-
-        <!-- Slide 4 -->
-        <div class="mySlides">
-            <img src="image4.jpg" alt="Traditional Sweet Native Desserts" onclick="openModal(this)">
-        </div>
-
-        <!-- Slide 5 -->
-        <div class="mySlides">
-            <img src="image5.jpg" alt="Lumpia Kwin Specialty Dish" onclick="openModal(this)">
-        </div>
-
-        <!-- Slide 6 -->
-        <div class="mySlides">
-            <img src="image6.jpg" alt="Lumpia Kwin Catering Tray" onclick="openModal(this)">
-        </div>
-
-        <!-- Slide 7 -->
-        <div class="mySlides">
-            <img src="image7.jpg" alt="Authentic Pinoy Cooking" onclick="openModal(this)">
-        </div>
-
-        <!-- Slide 8 -->
-        <div class="mySlides">
-            <img src="image8.jpg" alt="Homemade Filipino Goodness" onclick="openModal(this)">
-        </div>
-
-        <!-- Slide 9 -->
-        <div class="mySlides">
-            <img src="image9.jpg" alt="Auckland Favorite Filipino Food" onclick="openModal(this)">
-        </div>
-
-        <!-- Slide 10 -->
-        <div class="mySlides">
-            <img src="image10.jpg" alt="Lumpia Kwin Dessert" onclick="openModal(this)">
-        </div>
-
-        <!-- Slide 11 -->
-        <div class="mySlides">
-            <img src="image11.jpg" alt="Filipino Sauce and Vinegar Blend" onclick="openModal(this)">
-        </div>
-
-        <!-- Manual Navigation Handles -->
         <a class="prev-slide" onclick="plusSlides(-1)"><i class="fas fa-chevron-left"></i></a>
         <a class="next-slide" onclick="plusSlides(1)"><i class="fas fa-chevron-right"></i></a>
     </div>
 
-    <!-- GLOBAL LIGHTBOX MODAL WITH ZOOM CONTROL INTERFACES -->
+    <!-- GLOBAL LIGHTBOX MODAL -->
     <button type="button" id="modalCloseBtn" class="modal-close" style="display:none;" onclick="closeModal()"><i class="fas fa-times"></i></button>
     
     <div id="imageLightbox" class="image-modal" onclick="closeModal()">
@@ -752,8 +701,6 @@
             <option value="Delivery within Otara">Delivery within Otara</option>
             <option value="Delivery to wider Auckland Region">Delivery to wider Auckland Region</option>
         </select>
-
-        <!-- VISIBLE MENU ITEMS -->
         
         <!-- CATEGORY: LUMPIA -->
         <div class="menu-category"><i class="fas fa-utensils"></i> Lumpia (Spring Rolls)</div>
@@ -964,7 +911,6 @@
         <label for="notes" style="margin-top: 35px;">Delivery Address (if applicable) / Preferred Pickup Time</label>
         <textarea id="notes" name="notes" rows="3" placeholder="Enter instructions here..."></textarea>
 
-        <!-- Dynamic calculated total container -->
         <input type="hidden" name="Total_Calculated_Price" id="hidden_total_price" value="$0">
 
         <button type="submit" class="submit-btn">Submit Order 🌯</button>
@@ -975,7 +921,7 @@
     </form>
 </div>
 
-<!-- DYNAMIC ORDER REVIEW MODAL OVERLAY -->
+<!-- DYNAMIC ORDER REVIEW MODAL -->
 <div id="orderReviewModal" class="order-review-modal">
     <div class="review-box">
         <div class="review-title"><i class="fas fa-receipt"></i> Review Your Order</div>
@@ -992,9 +938,7 @@
             
             <div class="review-section">
                 <h4>Items Selected</h4>
-                <div class="review-data-card" id="revItemsContainer">
-                    <!-- Items injected here dynamically -->
-                </div>
+                <div class="review-data-card" id="revItemsContainer"></div>
             </div>
 
             <div class="review-section" id="revNotesSection">
@@ -1030,9 +974,7 @@
     <div class="copyright">&copy; 2026 Lumpia Kwin NZ. All Rights Reserved.</div>
 </footer>
 
-<!-- Logic Scripts -->
 <script>
-// Quantity Button Actions
 function changeQty(id, amount) {
     var valEl = document.getElementById(id + '_val');
     var inputEl = document.getElementById(id);
@@ -1043,14 +985,12 @@ function changeQty(id, amount) {
     inputEl.value = newValue;
 }
 
-// Global Image Variables & Lightbox System Objects
 var isModalOpen = false;
 var modal = document.getElementById("imageLightbox");
 var modalImg = document.getElementById("modalTargetImg");
 var modalWrapper = document.getElementById("modalWrapper");
 var modalCloseBtn = document.getElementById("modalCloseBtn");
 
-// Pinch-To-Zoom Touch Engine State Matrix
 let scale = 1;
 let lastScale = 1;
 let startTouchesDist = 0;
@@ -1064,8 +1004,6 @@ function openModal(imgElement) {
     modal.classList.add("show");
     modalImg.src = imgElement.src;
     modalCloseBtn.style.display = "flex";
-    
-    // Reset structural state configurations on init
     resetZoomState();
 }
 
@@ -1087,21 +1025,17 @@ function resetZoomState() {
 }
 
 function updateImageTransform() {
-    // Dynamic execution layer rendering structural zoom coordinates
     modalImg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
 }
 
-// Touch Handling Logic Engine (Two-finger Pinch & Pan Zooming)
 modalWrapper.addEventListener('touchstart', function(e) {
     if (e.touches.length === 2) {
-        // Compute initial hyphen distance target
         startTouchesDist = Math.hypot(
             e.touches[0].clientX - e.touches[1].clientX,
             e.touches[0].clientY - e.touches[1].clientY
         );
         lastScale = scale;
     } else if (e.touches.length === 1 && scale > 1) {
-        // Drag Pan init conditional loop
         isPanning = true;
         startX = e.touches[0].clientX - lastPosX;
         startY = e.touches[0].clientY - lastPosY;
@@ -1110,16 +1044,12 @@ modalWrapper.addEventListener('touchstart', function(e) {
 
 modalWrapper.addEventListener('touchmove', function(e) {
     if (e.touches.length === 2) {
-        e.preventDefault(); // Kill standard screen jitter routines
+        e.preventDefault();
         const currentDist = Math.hypot(
             e.touches[0].clientX - e.touches[1].clientX,
             e.touches[0].clientY - e.touches[1].clientY
         );
-        
-        // Calculate new scale multiplier safely bounded between 1x and 4x zoom thresholds
         scale = Math.min(Math.max(1, (currentDist / startTouchesDist) * lastScale), 4);
-        
-        // Lock tracking boundary parameters when scale returns down to unity baseline state
         if (scale === 1) {
             posX = 0;
             posY = 0;
@@ -1146,7 +1076,6 @@ modalWrapper.addEventListener('touchend', function(e) {
     }
 });
 
-// Close modals when pressing Escape
 document.addEventListener("keydown", function(event) {
     if (event.key === "Escape") {
         closeModal();
@@ -1154,7 +1083,6 @@ document.addEventListener("keydown", function(event) {
     }
 });
 
-// Slideshow Actions
 var slideIndex = 0;
 showSlides();
 
@@ -1162,7 +1090,6 @@ function plusSlides(n) {
     showSlidesManual(slideIndex += n);
 }
 
-// Automated cycle (changes every 4 seconds unless lightbox is open)
 function showSlides() {
     if (!isModalOpen) {
         var i;
@@ -1188,13 +1115,9 @@ function showSlidesManual(n) {
     slides[slideIndex-1].style.display = "block";  
 }
 
-/* ==========================================
-   ORDER REVIEW MODAL LOGIC ENGINE
-   ========================================== */
 function handleFormSubmit(event) {
     event.preventDefault();
 
-    // Verify cart total value
     var total = 0;
     var foodInputs = document.querySelectorAll('input[type="hidden"][data-price]');
     foodInputs.forEach(function(input) {
