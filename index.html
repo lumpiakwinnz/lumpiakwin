@@ -92,7 +92,7 @@
             animation: spin 20s linear infinite;
         }
 
-        @keyframes spin { 100% { transform: rotate(300deg); } }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
         /* About Us Section Styling */
         .about-us-box {
@@ -183,7 +183,7 @@
             border-color: #f59e0b;
         }
 
-        /* Professional Modal Styles - Centering Fix applied */
+        /* Professional Modal Styles */
         .image-modal {
             display: none;
             position: fixed;
@@ -192,14 +192,14 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: rgba(15, 23, 42, 0.95); /* Deepened for distraction-free view */
+            background-color: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             opacity: 0;
             transition: opacity 0.3s ease;
             padding: 16px;
             box-sizing: border-box;
-            overflow: hidden; /* Prevent page scrolling while previewing */
+            overflow: hidden;
         }
 
         .image-modal.show {
@@ -239,7 +239,7 @@
 
         .modal-close {
             position: absolute;
-            top: -55px; /* Pushed higher up to clear tight spacing constraints on modern displays */
+            top: -55px;
             right: 0;
             color: #e2e8f0;
             font-size: 24px;
@@ -261,7 +261,7 @@
             border-color: #f59e0b;
         }
 
-        /* Order Review Modal Custom Layout Styles */
+        /* Order Review Modal Layout Styles */
         .order-review-modal {
             display: none;
             position: fixed;
@@ -746,7 +746,7 @@
             <option value="Delivery to wider Auckland Region">Delivery to wider Auckland Region</option>
         </select>
 
-        <!-- VISIBLE MENU ITEMS START HERE -->
+        <!-- VISIBLE MENU ITEMS -->
         
         <!-- CATEGORY: LUMPIA -->
         <div class="menu-category"><i class="fas fa-utensils"></i> Lumpia (Spring Rolls)</div>
@@ -815,7 +815,7 @@
         </div>
 
         <!-- CATEGORY: ILOCOS EMPANADA -->
-        <div class="menu-category"><i class="fas fa-pie-chart"></i> Ilocos Empanada</div>
+        <div class="menu-category"><i class="fas fa-chart-pie"></i> Ilocos Empanada</div>
         <div style="font-size: 12px; margin:-12px 0 16px 0; color:#94a3b8; line-height: 1.4;">CRISPY GOLDEN-ORANGE RICE FLOUR CRUST FILLED WITH SAVORY SAUSAGE, GREEN PAPAYA, MUNG BEANS AND EGG WITH VINEGAR SAUCE.</div>
 
         <div class="menu-item">
@@ -957,7 +957,7 @@
         <label for="notes" style="margin-top: 35px;">Delivery Address (if applicable) / Preferred Pickup Time</label>
         <textarea id="notes" name="notes" rows="3" placeholder="Enter instructions here..."></textarea>
 
-        <!-- Dynamic element to capture calculated Total Price inside form payload -->
+        <!-- Dynamic calculated total container -->
         <input type="hidden" name="Total_Calculated_Price" id="hidden_total_price" value="$0">
 
         <button type="submit" class="submit-btn">Submit Order 🌯</button>
@@ -1042,17 +1042,17 @@ var modal = document.getElementById("imageLightbox");
 var modalImg = document.getElementById("modalTargetImg");
 
 function openModal(imgElement) {
-    isModalOpen = true; // Pauses auto slideshow
+    isModalOpen = true;
     modal.classList.add("show");
     modalImg.src = imgElement.src;
 }
 
 function closeModal() {
     modal.classList.remove("show");
-    isModalOpen = false; // Resumes auto slideshow
+    isModalOpen = false;
 }
 
-// Close modal when pressing the Esc key
+// Close modals when pressing Escape
 document.addEventListener("keydown", function(event) {
     if (event.key === "Escape") {
         closeModal();
@@ -1068,7 +1068,7 @@ function plusSlides(n) {
     showSlidesManual(slideIndex += n);
 }
 
-// Automated cycle (changes every 4 seconds unless modal lightbox is open)
+// Automated cycle (changes every 4 seconds unless lightbox is open)
 function showSlides() {
     if (!isModalOpen) {
         var i;
@@ -1083,7 +1083,6 @@ function showSlides() {
     setTimeout(showSlides, 4000); 
 }
 
-// Manual control override logic
 function showSlidesManual(n) {
     var i;
     var slides = document.getElementsByClassName("mySlides");
@@ -1099,10 +1098,9 @@ function showSlidesManual(n) {
    ORDER REVIEW MODAL LOGIC ENGINE
    ========================================== */
 function handleFormSubmit(event) {
-    // Prevent default direct dispatch to formspree
     event.preventDefault();
 
-    // Verify customer has picked at least 1 menu item before checking details
+    // Verify cart total value
     var total = 0;
     var foodInputs = document.querySelectorAll('input[type="hidden"][data-price]');
     foodInputs.forEach(function(input) {
@@ -1116,14 +1114,12 @@ function handleFormSubmit(event) {
         return false;
     }
 
-    // Capture standard form entries
     var name = document.getElementById('name').value;
     var phone = document.getElementById('phone').value;
     var locationSel = document.getElementById('location');
     var locationText = locationSel.options[locationSel.selectedIndex].text;
     var notes = document.getElementById('notes').value.trim();
 
-    // Ingest data safely into modal markup
     document.getElementById('revName').innerText = name;
     document.getElementById('revPhone').innerText = phone;
     document.getElementById('revLocation').innerText = locationText;
@@ -1135,9 +1131,8 @@ function handleFormSubmit(event) {
         document.getElementById('revNotesSection').style.display = "none";
     }
 
-    // Build the structural dynamic cart listing inside review section
     var container = document.getElementById('revItemsContainer');
-    container.innerHTML = ""; // clean layout box
+    container.innerHTML = "";
 
     foodInputs.forEach(function(input) {
         var qty = parseInt(input.value) || 0;
@@ -1153,11 +1148,9 @@ function handleFormSubmit(event) {
         }
     });
 
-    // Write pricing strings down
     document.getElementById('revTotalPrice').innerText = "$" + total;
     document.getElementById('hidden_total_price').value = "$" + total;
 
-    // Display overlay wrapper
     document.getElementById('orderReviewModal').classList.add('show');
 }
 
@@ -1166,7 +1159,6 @@ function closeReviewModal() {
 }
 
 function confirmAndSubmitForm() {
-    // Official trigger bypasses intermediate check execution
     document.getElementById('orderForm').submit();
 }
 </script>
