@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Lumpia Kwin NZ - Order Online</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght=500;600;700&family=Poppins:wght=400;500;600&display=swap" rel="stylesheet">
@@ -183,7 +183,7 @@
             border-color: #f59e0b;
         }
 
-        /* Professional Modal Styles */
+        /* FIXED & UPDATED: Professional Image Lightbox Modal */
         .image-modal {
             display: none;
             position: fixed;
@@ -197,29 +197,32 @@
             -webkit-backdrop-filter: blur(8px);
             opacity: 0;
             transition: opacity 0.3s ease;
-            padding: 16px;
+            padding: 20px;
             box-sizing: border-box;
             overflow: hidden;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .image-modal.show {
             display: flex;
-            align-items: center;
-            justify-content: center;
             opacity: 1;
         }
 
         .modal-content-wrapper {
             position: relative;
             width: 100%;
-            max-width: 420px;
-            max-height: 80vh;
+            max-width: 450px;
+            max-height: 75vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             transform: scale(0.9);
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: hidden; /* Contains the image when zooming */
+            touch-action: none; /* Disables browser-default zoom/pan adjustments */
+            border-radius: 16px;
         }
 
         .image-modal.show .modal-content-wrapper {
@@ -229,31 +232,34 @@
         .modal-img {
             width: 100%;
             height: auto;
-            max-height: 70vh;
+            max-height: 75vh;
             border-radius: 16px;
             object-fit: contain;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.15);
             display: block;
+            transform-origin: center center;
+            transition: transform 0.05s ease-out; /* Keeps updates looking real-time and snappy */
         }
 
+        /* Repositioned floating UI layout structure to prevent asset clipping */
         .modal-close {
-            position: absolute;
-            top: -55px;
-            right: 0;
+            position: fixed;
+            top: 20px;
+            right: 20px;
             color: #e2e8f0;
-            font-size: 24px;
+            font-size: 20px;
             cursor: pointer;
             transition: all 0.2s ease;
             background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            width: 44px;
-            height: 44px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            width: 46px;
+            height: 46px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 10;
+            z-index: 2010;
         }
 
         .modal-close:hover {
@@ -719,10 +725,11 @@
         <a class="next-slide" onclick="plusSlides(1)"><i class="fas fa-chevron-right"></i></a>
     </div>
 
-    <!-- GLOBAL LIGHTBOX MODAL -->
+    <!-- GLOBAL LIGHTBOX MODAL WITH ZOOM CONTROL INTERFACES -->
+    <button type="button" id="modalCloseBtn" class="modal-close" style="display:none;" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    
     <div id="imageLightbox" class="image-modal" onclick="closeModal()">
-        <div class="modal-content-wrapper" onclick="event.stopPropagation()">
-            <button type="button" class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+        <div class="modal-content-wrapper" id="modalWrapper" onclick="event.stopPropagation()">
             <img id="modalTargetImg" class="modal-img" src="" alt="">
         </div>
     </div>
@@ -1036,21 +1043,108 @@ function changeQty(id, amount) {
     inputEl.value = newValue;
 }
 
-// Modal Toggle Logic
+// Global Image Variables & Lightbox System Objects
 var isModalOpen = false;
 var modal = document.getElementById("imageLightbox");
 var modalImg = document.getElementById("modalTargetImg");
+var modalWrapper = document.getElementById("modalWrapper");
+var modalCloseBtn = document.getElementById("modalCloseBtn");
+
+// Pinch-To-Zoom Touch Engine State Matrix
+let scale = 1;
+let lastScale = 1;
+let startTouchesDist = 0;
+let isPanning = false;
+let startX = 0, startY = 0;
+let posX = 0, posY = 0;
+let lastPosX = 0, lastPosY = 0;
 
 function openModal(imgElement) {
     isModalOpen = true;
     modal.classList.add("show");
     modalImg.src = imgElement.src;
+    modalCloseBtn.style.display = "flex";
+    
+    // Reset structural state configurations on init
+    resetZoomState();
 }
 
 function closeModal() {
     modal.classList.remove("show");
+    modalCloseBtn.style.display = "none";
     isModalOpen = false;
+    resetZoomState();
 }
+
+function resetZoomState() {
+    scale = 1;
+    lastScale = 1;
+    posX = 0;
+    posY = 0;
+    lastPosX = 0;
+    lastPosY = 0;
+    updateImageTransform();
+}
+
+function updateImageTransform() {
+    // Dynamic execution layer rendering structural zoom coordinates
+    modalImg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+}
+
+// Touch Handling Logic Engine (Two-finger Pinch & Pan Zooming)
+modalWrapper.addEventListener('touchstart', function(e) {
+    if (e.touches.length === 2) {
+        // Compute initial hyphen distance target
+        startTouchesDist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+        );
+        lastScale = scale;
+    } else if (e.touches.length === 1 && scale > 1) {
+        // Drag Pan init conditional loop
+        isPanning = true;
+        startX = e.touches[0].clientX - lastPosX;
+        startY = e.touches[0].clientY - lastPosY;
+    }
+});
+
+modalWrapper.addEventListener('touchmove', function(e) {
+    if (e.touches.length === 2) {
+        e.preventDefault(); // Kill standard screen jitter routines
+        const currentDist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+        );
+        
+        // Calculate new scale multiplier safely bounded between 1x and 4x zoom thresholds
+        scale = Math.min(Math.max(1, (currentDist / startTouchesDist) * lastScale), 4);
+        
+        // Lock tracking boundary parameters when scale returns down to unity baseline state
+        if (scale === 1) {
+            posX = 0;
+            posY = 0;
+            lastPosX = 0;
+            lastPosY = 0;
+        }
+        updateImageTransform();
+    } else if (e.touches.length === 1 && isPanning) {
+        e.preventDefault();
+        posX = e.touches[0].clientX - startX;
+        posY = e.touches[0].clientY - startY;
+        updateImageTransform();
+    }
+});
+
+modalWrapper.addEventListener('touchend', function(e) {
+    isPanning = false;
+    if (e.touches.length < 2) {
+        lastScale = scale;
+    }
+    if (e.touches.length === 0) {
+        lastPosX = posX;
+        lastPosY = posY;
+    }
+});
 
 // Close modals when pressing Escape
 document.addEventListener("keydown", function(event) {
