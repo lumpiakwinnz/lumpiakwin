@@ -1239,8 +1239,9 @@ function handleFormSubmit(event) {
     var locationText = locationSel.options[locationSel.selectedIndex].text;
     var notes = document.getElementById('notes').value.trim();
 
-    // Dynamically update the email subject line
-    document.getElementById('emailSubject').value = "New Order from " + name;
+    // Generate a unique order reference using a random number and timestamp to prevent Gmail threading
+    var uniqueId = Math.floor(100000 + Math.random() * 900000); 
+    document.getElementById('emailSubject').value = "Order #" + uniqueId + " - " + name;
 
     document.getElementById('revName').innerText = name;
     document.getElementById('revPhone').innerText = phone;
