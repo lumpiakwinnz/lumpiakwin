@@ -674,7 +674,11 @@
     </div>
     
     <!-- FORMSPREE CONTAINER -->
-    <form id="orderForm" action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST" onsubmit="handleFormSubmit(event)">
+    <form id="orderForm" action="https://formspree.io/f/mbdnaqvz" method="POST" onsubmit="handleFormSubmit(event)">
+        
+        <!-- Formspree Control Customization Inputs -->
+        <input type="hidden" name="_subject" id="emailSubject" value="New Web Order">
+        <input type="hidden" name="Order_Summary" id="hidden_order_summary">
         
         <div class="menu-category"><i class="fas fa-user-circle"></i> Contact Info</div>
         
@@ -1135,6 +1139,9 @@ function handleFormSubmit(event) {
     var locationText = locationSel.options[locationSel.selectedIndex].text;
     var notes = document.getElementById('notes').value.trim();
 
+    // Dynamically update the email subject line
+    document.getElementById('emailSubject').value = "New Order from " + name;
+
     document.getElementById('revName').innerText = name;
     document.getElementById('revPhone').innerText = phone;
     document.getElementById('revLocation').innerText = locationText;
@@ -1149,6 +1156,9 @@ function handleFormSubmit(event) {
     var container = document.getElementById('revItemsContainer');
     container.innerHTML = "";
 
+    // Build plain-text order summary layout specifically tailored for Formspree emails
+    var summaryText = "--- ITEMS ORDERED ---\n";
+
     foodInputs.forEach(function(input) {
         var qty = parseInt(input.value) || 0;
         if (qty > 0) {
@@ -1156,13 +1166,23 @@ function handleFormSubmit(event) {
             var price = parseFloat(input.getAttribute('data-price'));
             var subtotal = qty * price;
 
+            // Update UI modal preview
             var row = document.createElement('div');
             row.className = "review-item-row";
             row.innerHTML = "<span>" + label + " <strong>x" + qty + "</strong></span><span>$" + subtotal + "</span>";
             container.appendChild(row);
+
+            // Append to Email text block
+            summaryText += label + " x" + qty + " ($" + subtotal + ")\n";
         }
     });
 
+    summaryText += "\n---------------------\n";
+    summaryText += "TOTAL AMOUNT: $" + total + "\n";
+    summaryText += "---------------------";
+
+    // Set values into the secret processing inputs
+    document.getElementById('hidden_order_summary').value = summaryText;
     document.getElementById('revTotalPrice').innerText = "$" + total;
     document.getElementById('hidden_total_price').value = "$" + total;
 
