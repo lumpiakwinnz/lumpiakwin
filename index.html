@@ -672,15 +672,6 @@
         <a class="prev-slide" onclick="plusSlides(-1)"><i class="fas fa-chevron-left"></i></a>
         <a class="next-slide" onclick="plusSlides(1)"><i class="fas fa-chevron-right"></i></a>
     </div>
-
-    <!-- GLOBAL LIGHTBOX MODAL -->
-    <button type="button" id="modalCloseBtn" class="modal-close" style="display:none;" onclick="closeModal()"><i class="fas fa-times"></i></button>
-    
-    <div id="imageLightbox" class="image-modal" onclick="closeModal()">
-        <div class="modal-content-wrapper" id="modalWrapper" onclick="event.stopPropagation()">
-            <img id="modalTargetImg" class="modal-img" src="" alt="">
-        </div>
-    </div>
     
     <!-- FORMSPREE CONTAINER -->
     <form id="orderForm" action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST" onsubmit="handleFormSubmit(event)">
@@ -920,7 +911,15 @@
     </form>
 </div>
 
-<!-- DYNAMIC ORDER REVIEW MODAL -->
+<!-- GLOBAL LIGHTBOX MODAL (Moved completely out of .container for layout correction) -->
+<button type="button" id="modalCloseBtn" class="modal-close" style="display:none;" onclick="closeModal()"><i class="fas fa-times"></i></button>
+<div id="imageLightbox" class="image-modal" onclick="closeModal()">
+    <div class="modal-content-wrapper" id="modalWrapper" onclick="event.stopPropagation()">
+        <img id="modalTargetImg" class="modal-img" src="" alt="">
+    </div>
+</div>
+
+<!-- DYNAMIC ORDER REVIEW MODAL (Moved completely out of .container for layout correction) -->
 <div id="orderReviewModal" class="order-review-modal">
     <div class="review-box">
         <div class="review-title"><i class="fas fa-receipt"></i> Review Your Order</div>
