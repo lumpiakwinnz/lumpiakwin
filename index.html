@@ -473,6 +473,17 @@
             background-color: rgba(15, 23, 42, 0.9);
         }
 
+        /* Conditional Field Wrapper Animation */
+        .conditional-field {
+            display: none;
+            animation: fadeInField 0.3s ease forwards;
+        }
+
+        @keyframes fadeInField {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .menu-item {
             background: rgba(15, 23, 42, 0.45);
             padding: 20px;
@@ -767,7 +778,7 @@
         <input type="hidden" name="_subject" id="emailSubject" value="New Web Order">
         <input type="hidden" name="Order_Summary" id="hidden_order_summary">
         
-        <div class="menu-category"><i class="fas fa-user-circle"></i> Contact Info</div>
+        <div class="menu-category"><i class="fas fa-user-circle"></i> Contact & Fulfillment Info</div>
         
         <label for="name">Name</label>
         <input type="text" id="name" name="name" required placeholder="Your full name">
@@ -775,13 +786,28 @@
         <label for="phone">Mobile Number</label>
         <input type="tel" id="phone" name="phone" required placeholder="e.g., 021 123 456">
 
+        <label for="order_date">Date to Receive Order</label>
+        <input type="date" id="order_date" name="order_date" required>
+
         <label for="location">Location & Collection Option</label>
-        <select id="location" name="location_option" required>
+        <select id="location" name="location_option" required onchange="toggleFulfillmentFields()">
             <option value="" disabled selected>Select option...</option>
             <option value="Pick-up from Otara">Pick-up from Otara</option>
             <option value="Delivery within Otara">Delivery within Otara</option>
             <option value="Delivery to wider Auckland Region">Delivery to wider Auckland Region</option>
         </select>
+        
+        <!-- CONDITIONAL FIELD: DELIVERY ADDRESS -->
+        <div id="deliveryAddressWrapper" class="conditional-field">
+            <label for="delivery_address">Delivery Address</label>
+            <input type="text" id="delivery_address" name="delivery_address" placeholder="Enter your full street address">
+        </div>
+
+        <!-- CONDITIONAL FIELD: PICKUP TIME -->
+        <div id="pickupTimeWrapper" class="conditional-field">
+            <label for="pickup_time">Preferred Pickup Time</label>
+            <input type="time" id="pickup_time" name="pickup_time">
+        </div>
         
         <!-- CATEGORY: LUMPIA -->
         <div class="menu-category"><i class="fas fa-utensils"></i> Lumpia (Spring Rolls)</div>
@@ -989,8 +1015,8 @@
             </div>
         </div>
 
-        <label for="notes" style="margin-top: 35px;">Delivery Address (if applicable) / Preferred Pickup Time</label>
-        <textarea id="notes" name="notes" rows="3" placeholder="Enter instructions here..."></textarea>
+        <label for="notes" style="margin-top: 35px;">Special Instructions / Allergy Requests</label>
+        <textarea id="notes" name="notes" rows="3" placeholder="Enter any specific order requests here..."></textarea>
 
         <input type="hidden" name="Total_Calculated_Price" id="hidden_total_price" value="$0">
 
@@ -1021,7 +1047,11 @@
                 <div class="review-data-card">
                     <strong>Name:</strong> <span id="revName"></span><br>
                     <strong>Mobile:</strong> <span id="revPhone"></span><br>
-                    <strong>Option:</strong> <span id="revLocation"></span>
+                    <strong>Date to Receive:</strong> <span id="revDate"></span><br>
+                    <strong>Fulfillment:</strong> <span id="revLocation"></span>
+                    <div id="revFulfillmentDetailBox" style="margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 4px; display: none;">
+                        <span id="revFulfillmentLabel"></span> <span id="revFulfillmentValue"></span>
+                    </div>
                 </div>
             </div>
             
@@ -1076,6 +1106,39 @@
 </footer>
 
 <script>
+// Prevent historical date selections automatically
+document.addEventListener("DOMContentLoaded", function() {
+    var today = new Date().toISOString().split('T')[0];
+    document.getElementById('order_date').setAttribute('min', today);
+});
+
+function toggleFulfillmentFields() {
+    var option = document.getElementById('location').value;
+    var deliveryWrapper = document.getElementById('deliveryAddressWrapper');
+    var deliveryInput = document.getElementById('delivery_address');
+    var pickupWrapper = document.getElementById('pickupTimeWrapper');
+    var pickupInput = document.getElementById('pickup_time');
+
+    if (option === "Delivery within Otara" || option === "Delivery to wider Auckland Region") {
+        deliveryWrapper.style.display = "block";
+        deliveryInput.required = true;
+        pickupWrapper.style.display = "none";
+        pickupInput.required = false;
+        pickupInput.value = "";
+    } else if (option === "Pick-up from Otara") {
+        deliveryWrapper.style.display = "none";
+        deliveryInput.required = false;
+        deliveryInput.value = "";
+        pickupWrapper.style.display = "block";
+        pickupInput.required = true;
+    } else {
+        deliveryWrapper.style.display = "none";
+        deliveryInput.required = false;
+        pickupWrapper.style.display = "none";
+        pickupInput.required = false;
+    }
+}
+
 function changeQty(id, amount) {
     var valEl = document.getElementById(id + '_val');
     var inputEl = document.getElementById(id);
@@ -1235,17 +1298,36 @@ function handleFormSubmit(event) {
 
     var name = document.getElementById('name').value;
     var phone = document.getElementById('phone').value;
+    var orderDate = document.getElementById('order_date').value;
     var locationSel = document.getElementById('location');
     var locationText = locationSel.options[locationSel.selectedIndex].text;
+    var deliveryAddress = document.getElementById('delivery_address').value.trim();
+    var pickupTime = document.getElementById('pickup_time').value;
     var notes = document.getElementById('notes').value.trim();
 
-    // Generate a unique order reference using a random number and timestamp to prevent Gmail threading
     var uniqueId = Math.floor(100000 + Math.random() * 900000); 
     document.getElementById('emailSubject').value = "Order #" + uniqueId + " - " + name;
 
     document.getElementById('revName').innerText = name;
     document.getElementById('revPhone').innerText = phone;
+    document.getElementById('revDate').innerText = orderDate;
     document.getElementById('revLocation').innerText = locationText;
+
+    var detailBox = document.getElementById('revFulfillmentDetailBox');
+    var detailLabel = document.getElementById('revFulfillmentLabel');
+    var detailValue = document.getElementById('revFulfillmentValue');
+
+    if (deliveryAddress) {
+        detailBox.style.display = "block";
+        detailLabel.innerHTML = "<strong>Address:</strong>";
+        detailValue.innerText = deliveryAddress;
+    } else if (pickupTime) {
+        detailBox.style.display = "block";
+        detailLabel.innerHTML = "<strong>Time:</strong>";
+        detailValue.innerText = pickupTime;
+    } else {
+        detailBox.style.display = "none";
+    }
 
     if (notes) {
         document.getElementById('revNotesSection').style.display = "block";
@@ -1257,8 +1339,12 @@ function handleFormSubmit(event) {
     var container = document.getElementById('revItemsContainer');
     container.innerHTML = "";
 
-    // Build plain-text order summary layout specifically tailored for Formspree emails
-    var summaryText = "--- ITEMS ORDERED ---\n";
+    // Build Formspree email data summary structure
+    var summaryText = "--- FULFILLMENT DETAILS ---\n";
+    summaryText += "Requested Date: " + orderDate + "\n";
+    if (deliveryAddress) summaryText += "Delivery Address: " + deliveryAddress + "\n";
+    if (pickupTime) summaryText += "Preferred Pickup Time: " + pickupTime + "\n";
+    summaryText += "\n--- ITEMS ORDERED ---\n";
 
     foodInputs.forEach(function(input) {
         var qty = parseInt(input.value) || 0;
@@ -1267,13 +1353,11 @@ function handleFormSubmit(event) {
             var price = parseFloat(input.getAttribute('data-price'));
             var subtotal = qty * price;
 
-            // Update UI modal preview
             var row = document.createElement('div');
             row.className = "review-item-row";
             row.innerHTML = "<span>" + label + " <strong>x" + qty + "</strong></span><span>$" + subtotal + "</span>";
             container.appendChild(row);
 
-            // Append to Email text block
             summaryText += label + " x" + qty + " ($" + subtotal + ")\n";
         }
     });
@@ -1282,7 +1366,6 @@ function handleFormSubmit(event) {
     summaryText += "TOTAL AMOUNT: $" + total + "\n";
     summaryText += "---------------------";
 
-    // Set values into the secret processing inputs
     document.getElementById('hidden_order_summary').value = summaryText;
     document.getElementById('revTotalPrice').innerText = "$" + total;
     document.getElementById('hidden_total_price').value = "$" + total;
@@ -1298,25 +1381,27 @@ function confirmAndSubmitForm() {
     var form = document.getElementById('orderForm');
     var proceedBtn = document.getElementById('proceedBtn');
     
-    // Change button state to indicate processing
     proceedBtn.disabled = true;
     proceedBtn.innerHTML = 'Sending... <i class="fas fa-spinner fa-spin"></i>';
 
-    // Formspree parses the FormData fields automatically.
-    // To prevent 0 quantities from showing up at the bottom of the email under their raw input names,
-    // we generate a clean FormData object and ONLY append food fields that have a value > 0.
     var formData = new FormData();
     
-    // Add standard client information
     formData.append('_subject', document.getElementById('emailSubject').value);
     formData.append('Order_Summary', document.getElementById('hidden_order_summary').value);
     formData.append('name', document.getElementById('name').value);
     formData.append('phone', document.getElementById('phone').value);
+    formData.append('order_date', document.getElementById('order_date').value);
     formData.append('location_option', document.getElementById('location').value);
+    
+    var deliveryAddr = document.getElementById('delivery_address').value;
+    if (deliveryAddr) formData.append('delivery_address', deliveryAddr);
+    
+    var pickupTm = document.getElementById('pickup_time').value;
+    if (pickupTm) formData.append('pickup_time', pickupTm);
+
     formData.append('notes', document.getElementById('notes').value);
     formData.append('Total_Calculated_Price', document.getElementById('hidden_total_price').value);
 
-    // Filter hidden fields dynamically (only append to form payload if > 0)
     var foodInputs = document.querySelectorAll('input[type="hidden"][data-price]');
     foodInputs.forEach(function(input) {
         var qty = parseInt(input.value) || 0;
@@ -1325,7 +1410,6 @@ function confirmAndSubmitForm() {
         }
     });
 
-    // Send asynchronously via fetch() to suppress Formspree's landing page redirection
     fetch(form.action, {
         method: 'POST',
         body: formData,
@@ -1335,12 +1419,11 @@ function confirmAndSubmitForm() {
     })
     .then(function(response) {
         if (response.ok) {
-            // Close review modal and display custom Thank You layout
             closeReviewModal();
             document.getElementById('thankYouModal').classList.add('show');
             form.reset();
+            toggleFulfillmentFields(); // Clear dynamically mapped UI blocks
             
-            // Reset stepper visual numbers back to 0
             document.querySelectorAll('.stepper-value').forEach(function(el) {
                 el.innerText = "0";
             });
@@ -1355,7 +1438,6 @@ function confirmAndSubmitForm() {
         alert("Oops! There was a problem sending your form data. Please check your network and try again.");
     })
     .finally(function() {
-        // Re-enable button state restoration
         proceedBtn.disabled = false;
         proceedBtn.innerHTML = 'Proceed & Send <i class="fas fa-paper-plane"></i>';
     });
